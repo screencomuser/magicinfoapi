@@ -1,0 +1,37 @@
+{
+    "name": "screencom/magicinfoapi",
+    "description": "MagicInfo OpenApi access",
+    "license": "Proprietary",
+    "authors": [
+        {
+            "name": "Michiel van Leening",
+            "email": "michiel@screencom.eu"
+        }
+    ],
+    "homepage": "https://github.com/screencom/magicinfoapi",
+    "keywords": ["Laravel", "MagicinfoApi"],
+    "require": {
+        "illuminate/support": "~5",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Screencom\\MagicinfoApi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Screencom\\MagicinfoApi\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Screencom\\MagicinfoApi\\MagicinfoApiServiceProvider"
+            ],
+            "aliases": {
+                "MagicinfoApi": "Screencom\\MagicinfoApi\\Facades\\MagicinfoApi"
+            }
+        }
+    }
+}
