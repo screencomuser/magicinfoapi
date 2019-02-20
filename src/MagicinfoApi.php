@@ -26,15 +26,31 @@ class MagicinfoApi
     protected $token;
 
     /**
-     * OpenApi constructor.
+     * MagicinfoApi constructor.
+     *
+     * @param string $base_uri
      */
-    public function __construct($base_uri)
+    public function __construct($base_uri = '')
+    {
+        if (! empty($base_uri)) {
+            $this->setBaseUri($base_uri);
+        }
+    }
+
+    /**
+     * @param string $base_uri
+     *
+     * @return MagicinfoApi
+     */
+    public function setBaseUri($base_uri)
     {
         $this->client = new \GuzzleHttp\Client([
             'base_uri' => $base_uri,
             'timeout'  => 10.0,
             'debug'    => false,
         ]);
+
+        return $this;
     }
 
     /**
