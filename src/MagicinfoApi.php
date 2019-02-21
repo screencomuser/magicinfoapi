@@ -292,6 +292,25 @@ class MagicinfoApi
     }
 
     /**
+     * @param string $groupName
+     *
+     * @return bool|int
+     * @throws Exception
+     */
+    public function findOrganizationId($groupName)
+    {
+        $response = $this->fetchOrganizationList();
+
+        foreach ($response->responseClass->resultList->UserGroup as $item) {
+            if ($item->group_name == $groupName) {
+                return (int)$item->group_id;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return \GuzzleHttp\Client
      */
     public function getClient()
