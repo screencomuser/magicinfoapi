@@ -2,6 +2,8 @@
 
 namespace Screencom\MagicinfoApi;
 
+use Exception;
+
 class MagicinfoApi
 {
 
@@ -55,7 +57,7 @@ class MagicinfoApi
 
     /**
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
     public function fetchToken()
     {
@@ -71,7 +73,7 @@ class MagicinfoApi
      * @param bool $addToken
      *
      * @return \SimpleXMLElement
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execRequest($request, $addToken = true)
     {
@@ -82,7 +84,7 @@ class MagicinfoApi
         $response = $this->client->get($request);
 
         if ($response->getStatusCode() != 200) {
-            throw new \Exception(__CLASS__ . ' : response error, code = ' . $response->getStatusCode(),
+            throw new Exception(__CLASS__ . ' : response error, code = ' . $response->getStatusCode(),
                 $response->getStatusCode());
         }
 
@@ -102,7 +104,7 @@ class MagicinfoApi
         */
 
         if ((string)$xml['code']) {
-            throw new \Exception($xml->errorMessage);
+            throw new Exception($xml->errorMessage);
         }
 
         return $xml;
@@ -144,7 +146,7 @@ class MagicinfoApi
      * @param $user
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function addOrganization($name, $user)
     {
@@ -173,7 +175,7 @@ class MagicinfoApi
      * @param $request
      *
      * @return \SimpleXMLElement
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execPostRequest($request)
     {
@@ -195,14 +197,14 @@ class MagicinfoApi
         }
 
         if ($response->getStatusCode() != 200) {
-            throw new \Exception(__CLASS__ . ' : response error, code = ' . $response->getStatusCode(),
+            throw new Exception(__CLASS__ . ' : response error, code = ' . $response->getStatusCode(),
                 $response->getStatusCode());
         }
 
         $xml = new \SimpleXMLElement($response->getBody()->getContents(), LIBXML_NOCDATA);
 
         if ((string)$xml['code']) {
-            throw new \Exception($xml->errorMessage);
+            throw new Exception($xml->errorMessage);
         }
 
         return $xml;
@@ -214,7 +216,7 @@ class MagicinfoApi
      * @todo Afmaken!
      *
      * @return \SimpleXMLElement
-     * @throws \Exception
+     * @throws Exception
      */
     public function disableUser(User $user)
     {
@@ -235,13 +237,14 @@ class MagicinfoApi
 
     /**
      * @param $userId
+     * @param string $reason
      *
      * @return \SimpleXMLElement
-     * @throws \Exception
+     * @throws Exception
      */
-    public function deleteUser($userId)
+    public function deleteUser($userId, $reason = 'delete')
     {
-        $xml = $this->execRequest('open?service=CommonUserService.deleteUser&userId=' . $userId . '&reason=delete');
+        $xml = $this->execRequest('open?service=CommonUserService.deleteUser&userId=' . $userId . '&delReason=' . $reason);
 
         return $xml;
 
@@ -249,13 +252,14 @@ class MagicinfoApi
 
     /**
      * @param $userGroupId
+     * @param string $reason
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    public function deleteOrganization($userGroupId)
+    public function deleteOrganization($userGroupId, $reason = 'delete')
     {
-        $xml = $this->execRequest('open?service=CommonUserService.deleteOrganization&userGroupId=' . $userGroupId . '&delReason=delete');
+        $xml = $this->execRequest('open?service=CommonUserService.deleteOrganization&userGroupId=' . $userGroupId . '&delReason=' . $reason);
 
         return $xml;
 
@@ -265,7 +269,7 @@ class MagicinfoApi
      * @param int $userGroupId
      *
      * @return \SimpleXMLElement
-     * @throws \Exception
+     * @throws Exception
      */
     public function fetchUserList($userGroupId = 0)
     {
@@ -277,7 +281,7 @@ class MagicinfoApi
 
     /**
      * @return stdClass
-     * @throws \Exception
+     * @throws Exception
      */
     public function fetchOrganizationList()
     {
