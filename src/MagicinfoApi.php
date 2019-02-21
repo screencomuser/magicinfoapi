@@ -46,6 +46,9 @@ class MagicinfoApi
      */
     public function setBaseUri($base_uri)
     {
+        // make sure an / is at the end
+        $base_uri = rtrim($base_uri, '/') . '/';
+
         $this->client = new \GuzzleHttp\Client([
             'base_uri' => $base_uri,
             'timeout'  => 10.0,
