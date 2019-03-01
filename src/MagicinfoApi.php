@@ -283,6 +283,25 @@ class MagicinfoApi
     }
 
     /**
+     * @param     $user_id
+     *
+     * @return bool|string
+     * @throws Exception
+     */
+    public function findUserId($user_id)
+    {
+        $response = $this->fetchUserList();
+
+        foreach ($response->responseClass->resultList->User as $item) {
+            if ($item->user_id == $user_id) {
+                return (string)$item->user_id;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return stdClass
      * @throws Exception
      */
