@@ -34,7 +34,7 @@ class MagicinfoApi
      */
     public function __construct($base_uri = '')
     {
-        if (! empty($base_uri)) {
+        if ( ! empty($base_uri)) {
             $this->setBaseUri($base_uri);
         }
     }
@@ -175,6 +175,31 @@ class MagicinfoApi
     }
 
     /**
+     * @param User $user
+     *
+     * @todo Afmaken!
+     *
+     * @return \SimpleXMLElement
+     * @throws Exception
+     */
+    public function disableUser(User $user)
+    {
+
+        return false;
+
+        $request                                            = new \SimpleXMLElement('<request/>');
+        $request->service->id                               = 'CommonUserService.modifyUser';
+        $request->service->parameters->user->User->user_id  = strtolower(str_replace(' ', '', $user->name));
+        $request->service->parameters->user->User->password = sha1(microtime());
+
+        $xml = $this->execPostRequest($request);
+
+        $xml = $this->execRequest('open?service=CommonUserService.modifyUser&organName=' . $name . '&newAdmin=' . $userXML);
+
+        return $xml;
+    }
+
+    /**
      * @param $request
      *
      * @return \SimpleXMLElement
@@ -214,32 +239,7 @@ class MagicinfoApi
     }
 
     /**
-     * @param User $user
-     *
-     * @todo Afmaken!
-     *
-     * @return \SimpleXMLElement
-     * @throws Exception
-     */
-    public function disableUser(User $user)
-    {
-
-        return false;
-
-        $request                                            = new \SimpleXMLElement('<request/>');
-        $request->service->id                               = 'CommonUserService.modifyUser';
-        $request->service->parameters->user->User->user_id  = strtolower(str_replace(' ', '', $user->name));
-        $request->service->parameters->user->User->password = sha1(microtime());
-
-        $xml = $this->execPostRequest($request);
-
-        $xml = $this->execRequest('open?service=CommonUserService.modifyUser&organName=' . $name . '&newAdmin=' . $userXML);
-
-        return $xml;
-    }
-
-    /**
-     * @param $userId
+     * @param        $userId
      * @param string $reason
      *
      * @return \SimpleXMLElement
@@ -254,7 +254,7 @@ class MagicinfoApi
     }
 
     /**
-     * @param $userGroupId
+     * @param        $userGroupId
      * @param string $reason
      *
      * @return mixed
@@ -263,20 +263,6 @@ class MagicinfoApi
     public function deleteOrganization($userGroupId, $reason = 'delete')
     {
         $xml = $this->execRequest('open?service=CommonUserService.deleteOrganization&userGroupId=' . $userGroupId . '&delReason=' . $reason);
-
-        return $xml;
-
-    }
-
-    /**
-     * @param int $userGroupId
-     *
-     * @return \SimpleXMLElement
-     * @throws Exception
-     */
-    public function fetchUserList($userGroupId = 0)
-    {
-        $xml = $this->execRequest('open?service=CommonUserService.getUserList&groupId=' . $userGroupId . '&isAll=true');
 
         return $xml;
 
@@ -302,12 +288,14 @@ class MagicinfoApi
     }
 
     /**
-     * @return stdClass
+     * @param int $userGroupId
+     *
+     * @return \SimpleXMLElement
      * @throws Exception
      */
-    public function fetchOrganizationList()
+    public function fetchUserList($userGroupId = 0)
     {
-        $xml = $this->execRequest('open?service=CommonUserService.getOrganizationList');
+        $xml = $this->execRequest('open?service=CommonUserService.getUserList&groupId=' . $userGroupId . '&isAll=true');
 
         return $xml;
 
@@ -330,6 +318,44 @@ class MagicinfoApi
         }
 
         return false;
+    }
+
+    /**
+     * @return stdClass
+     * @throws Exception
+     */
+    public function fetchOrganizationList()
+    {
+        $xml = $this->execRequest('open?service=CommonUserService.getOrganizationList');
+
+        return $xml;
+
+    }
+
+    /**
+     * @param $parameters
+     *
+     * @return \SimpleXMLElement
+     * @throws Exception
+     *
+     * 'ftpContentName'  => 'Name as displayed',
+     * 'ftpAddress'      => 'ftp.server.com',
+     * 'ftpDirectory'    => '/path/to/files',
+     * 'ftpPort'         => '21',
+     * 'group_id'        => '1',
+     * 'loginId'         => 'ftpuser',
+     * 'password'        => '***********',
+     * 'refreshInterval' => '30',
+     *
+     */
+    public function addFtpContent($parameters)
+    {
+
+        $query = \GuzzleHttp\Psr7\build_query($parameters);
+
+        $xml = $this->execRequest('open?service=CommonContentService.addFtpContent&' . $query);
+
+        return $xml;
     }
 
     /**
