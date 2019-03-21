@@ -359,6 +359,39 @@ class MagicinfoApi
     }
 
     /**
+     *
+     * Find an FTP content item on name - only items are returned that belong to the logged in user
+     *
+     * @param $name
+     *
+     * @return bool|\SimpleXMLElement
+     * @throws Exception
+     */
+    public function findFtpContent($name)
+    {
+        $condition                  = new \SimpleXMLElement('<ContentSearch/>');
+        $condition->pageSize        = 10;
+        $condition->searchType      = 'all';
+        $condition->startPos        = 1;
+        $condition->searchMediaType = 'FTP';
+        $condition->searchText      = $name;
+
+        $query = \GuzzleHttp\Psr7\build_query([
+            'userId'     => $this->username,
+            'condition'  => trim(str_replace('<?xml version="1.0"?>', '', $condition->asXML())),
+            'deviceType' => 'SPLAYER'
+        ]);
+
+        $xml = $this->execRequest('open?service=CommonContentService.getContentList&' . $query);
+
+        if ($xml->responseClass->totalCount) {
+            return $xml->responseClass->resultList->Content;
+        }
+
+        return false;
+    }
+
+    /**
      * @return \GuzzleHttp\Client
      */
     public function getClient()
