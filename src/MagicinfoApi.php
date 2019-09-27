@@ -28,6 +28,19 @@ class MagicinfoApi
     protected $token;
 
     /**
+     * @var \GuzzleHttp\Client
+     */
+    protected $swagger;
+
+    /**
+     * @var string
+     */
+    protected $swagger_token;
+
+    /** @var string */
+    protected $swagger_base_uri;
+
+    /**
      * MagicinfoApi constructor.
      *
      * @param string $base_uri
@@ -55,6 +68,17 @@ class MagicinfoApi
             'debug'    => false,
         ]);
 
+        $uri_parts = parse_url((string)$this->client->getConfig('base_uri'));
+        $uri_parts['path'] = '/MagicInfo';
+
+        $this->swagger_base_uri = http_build_url($uri_parts);
+
+        $this->swagger = new \GuzzleHttp\Client([
+            'base_uri' => $this->swagger_base_uri,
+            'timeout'  => 10.0,
+            'debug'    => false,
+        ]);
+
         return $this;
     }
 
@@ -69,6 +93,21 @@ class MagicinfoApi
         $this->setToken($xml->responseClass);
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function fetchSwaggerToken()
+    {
+        $endpoint    = '/auth';
+        $requestType = 'POST';
+        $postfields  = "{\n\t\"username\" : \"" . $this->username . "\",\n\t\"password\" : \"" . $this->password . "\"\n}";
+
+        $response = $this->connect($endpoint, $requestType, null, $postfields);
+
+        return $this;
+
     }
 
     /**
@@ -92,19 +131,6 @@ class MagicinfoApi
         }
 
         $xml = new \SimpleXMLElement($response->getBody()->getContents(), LIBXML_NOCDATA);
-
-        /*
-        try {
-        } catch (\Exception $e) {
-            file_put_contents(
-                env('STORAGE_PATH') . '/logs/openapi-response.log',
-                $response->getBody()->getContents() . PHP_EOL . str_repeat('=', 80) . PHP_EOL,
-                FILE_APPEND
-            );
-
-            return false;
-        }
-        */
 
         if ((string)$xml['code']) {
             throw new Exception($xml->errorMessage);
@@ -299,6 +325,29 @@ class MagicinfoApi
 
         return $xml;
 
+    }
+
+    /**
+     * @param $userId
+     * @return \SimpleXMLElement
+     * @throws Exception
+     */
+    public function fetchPlaylistList($userId)
+    {
+        // ContentSearch
+
+        $ContentSearch = new \SimpleXMLElement('<ContentSearch/>');
+        $ContentSearch->startPos = 1;
+        $ContentSearch->pageSize = 100;
+        $ContentSearch->searchType = 'all';
+
+        $userXML = str_replace(PHP_EOL, '', $ContentSearch->asXML());
+        $userXML = str_replace('<?xml version="1.0"?>', '', $userXML);
+        $userXML = html_entity_decode($userXML, ENT_NOQUOTES, 'UTF-8');
+
+        $xml = $this->execRequest('open?service=PremiumPlaylistService.getPlaylistList&userId=' . $userId . '&deviceType=S3PLAYER&condition=' . $userXML);
+
+        return $xml;
     }
 
     /**
