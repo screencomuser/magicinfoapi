@@ -3,6 +3,7 @@
 namespace Screencom\MagicinfoApi;
 
 use Exception;
+use Screencom\MagicinfoApi\Post\Api;
 
 class MagicinfoApi
 {
@@ -52,6 +53,11 @@ class MagicinfoApi
         }
     }
 
+    public function getPostApi()
+    {
+        return new Api( $this->getSwaggerBaseUri(), $this->getUsername(), $this->getPassword());
+    }
+
     /**
      * @param string $base_uri
      *
@@ -80,6 +86,14 @@ class MagicinfoApi
         ]);
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSwaggerBaseUri()
+    {
+        return $this->swagger_base_uri;
     }
 
     /**
@@ -348,6 +362,34 @@ class MagicinfoApi
         $xml = $this->execRequest('open?service=PremiumPlaylistService.getPlaylistList&userId=' . $userId . '&deviceType=S3PLAYER&condition=' . $userXML);
 
         return $xml;
+    }
+
+    /**
+     * @param $content_id
+     *
+     * BA6425E4-FE1D-48DC-ADCA-92D5B0DF8957
+     *
+     * @return bool|\SimpleXMLElement
+     * @throws Exception
+     */
+    public function getContentInfo($content_id)
+    {
+        /*
+         * http://192.168.0.69:7001/MagicInfo/openapi/
+         * open?service=CommonContentService.getContentInfo
+         * &token=JDNjNzA0YjUwMDEyZGYyYmIkdA%3D%3D&contentId=BA6425E4-FE1D-48DC-ADCA-92D5B0DF8957
+         */
+
+        $query = \GuzzleHttp\Psr7\build_query([
+            'contentId' => $content_id
+        ]);
+
+        try {
+            $xml = $this->execRequest('open?service=CommonContentService.getContentInfo&' . $query);
+            return $xml->responseClass;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
