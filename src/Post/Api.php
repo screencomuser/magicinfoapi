@@ -4,23 +4,37 @@ namespace Screencom\MagicinfoApi\Post;
 
 class Api extends Magicinfo
 {
+    /** @var string */
     protected $loginendpoint;
 
+    /** @var string */
     protected $csrfendpoint;
+
+    /** @var array */
+    protected $guzzle_options = [
+        'timeout' => 10
+    ];
 
     /**
      * Api constructor.
-     * @param $endpoint
-     * @param $username
-     * @param $password
+     *
+     * @param string $endpoint
+     * @param string $username
+     * @param string $password
+     * @param array $options
+     *
      * @throws \Exception
      */
-    public function __construct($endpoint, $username, $password)
+    public function __construct($endpoint, $username, $password, $options = [])
     {
         parent::__construct($endpoint, $username, $password, false);
 
         $this->loginendpoint = join('/', [$this->endpoint, 'j_spring_security_check']);
         $this->csrfendpoint = join('/', [$this->endpoint, 'login.htm?cmd=INIT']);
+
+        if (! empty($options)) {
+            $this->guzzle_options = $options;
+        }
 
         $this->login();
     }
@@ -32,7 +46,7 @@ class Api extends Magicinfo
     public function csrf()
     {
         try {
-            $response = $this->client->get($this->csrfendpoint);
+            $response = $this->client->get($this->csrfendpoint, $this->guzzle_options);
 
             $body = $response->getBody()->getContents();
 
@@ -125,9 +139,13 @@ class Api extends Magicinfo
     public function uploadImageContent($filename, $contentId = null)
     {
         if (is_null($contentId)) {
+            /**
+             * New content item
+             */
             $query = http_build_query([
                 'groupId' => '',
             ]);
+
             $options = [
                 'multipart' => [
                     [
@@ -141,9 +159,13 @@ class Api extends Magicinfo
                 ],
             ];
         } else {
+            /**
+             * Existing content item
+             */
             $query = http_build_query([
                 'contentId' => $contentId,
             ]);
+
             $options = [
                 'multipart' => [
                     [
