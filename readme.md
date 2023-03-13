@@ -42,7 +42,11 @@ If you discover any security related issues, please email author email instead o
 
 ## License
 
-license. Please see the [license file](license.md) for more information.
+Please see the [license file](license.md) for more information.
+
+## Testing
+
+This project is tested with BrowserStack.
 
 [ico-version]: https://img.shields.io/packagist/v/screencom/magicinfoapi.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/screencom/magicinfoapi.svg?style=flat-square
